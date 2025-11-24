@@ -100,54 +100,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
 }
 
-GLFWwindow* tryCreateWindow(unsigned int majorVersion, unsigned int minorVersion)
-{
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE.c_str(), nullptr, nullptr);
-    return window;
-}
-
-GLFWwindow* createHighestVersionWindow(unsigned int maxMajorVersion, unsigned int maxMinorVersion)
-{
-    GLFWwindow* retWindow = nullptr;
-    for (unsigned int majorVersion = maxMajorVersion; majorVersion >= 3 && !retWindow; majorVersion--)
-    {
-        for (unsigned int minorVersion = maxMinorVersion; minorVersion >= 0 && !retWindow; minorVersion--)
-        {
-            retWindow = tryCreateWindow(majorVersion, minorVersion);
-            if (retWindow)
-            {
-                std::cout << "Got context: OpenGL " << majorVersion << "." << minorVersion << "\n";
-                return retWindow;
-            }
-        }
-    }
-    std::cerr << "No OpenGL 3.x+ context could be created\n";
-    return nullptr;
-}
-
-std::string getGLSLVersionString(const char* glslVersion)
-{
-    std::string version = glslVersion;
-    size_t spaceIndex = version.find(" ");
-    if (spaceIndex != std::string::npos)
-    {
-        version = version.substr(0, spaceIndex);
-    }
-    size_t dotIndex = version.find(".");
-    if (dotIndex != std::string::npos)
-    {
-        version.erase(dotIndex, 1);
-    }
-    // return "#version " + version + " core\n";
-    return "";
-}
-
 std::vector<GLuint> getVertexIndices(size_t vertexCount)
 {
     std::vector<GLuint> indices;
@@ -271,7 +223,14 @@ std::vector<glm::vec3> circle(float radius, unsigned int points)
 int main()
 {
     glfwInit();
-    GLFWwindow* window = createHighestVersionWindow((unsigned int)4, (unsigned int)6);
+    
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    #ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE.c_str(), nullptr, nullptr);
     if (!window)
     {
         throw std::runtime_error("Failed to create an OpenGL context\n");
@@ -294,12 +253,10 @@ int main()
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    const char* glslVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-    const std::string glslVersionString = getGLSLVersionString(glslVersion) + "\n";
-    std::cout << "Shader language version: " << glslVersion << "\n";
-    const std::string vertexShaderSource = glslVersionString + getShaderSource("phong.vert");
+    std::cout << "Shader language version " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
+    const std::string vertexShaderSource = getShaderSource("phong.vert");
     const Shader vertexShader{vertexShaderSource, GL_VERTEX_SHADER};
-    const std::string fragmentShaderSource = glslVersionString + getShaderSource("phong.frag");
+    const std::string fragmentShaderSource = getShaderSource("phong.frag");
     const Shader fragmentShader{fragmentShaderSource, GL_FRAGMENT_SHADER};
 
     ShaderProgram shaderProgram{{vertexShader, fragmentShader}};
