@@ -1,0 +1,31 @@
+{
+    "version":"0.2.0",
+    "configurations":[
+        {
+            "name":"run opengl-testing",
+            "type":"cppdbg",
+            "request":"launch",
+            "program":"${workspaceFolder}/opengl-testing",
+            "args":[],
+            "stopAtEntry":false,
+            "cwd":"${workspaceFolder}",
+            "environment":[],
+            "externalConsole":true,
+            "MIMode":"lldb",
+            "preLaunchTask":"build-opengl-testing"
+        },
+        {
+            "name":"run test",
+            "type":"cppdbg",
+            "request":"launch",
+            "program":"${workspaceFolder}/test",
+            "args":[],
+            "stopAtEntry":false,
+            "cwd":"${workspaceFolder}",
+            "environment":[],
+            "externalConsole":true,
+            "MIMode":"lldb",
+            "preLaunchTask":"build-test"
+        }
+    ]
+}

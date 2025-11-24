@@ -1,0 +1,47 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-opengl-testing",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++17",
+                "src/main.cpp",
+                "src/Shape.cpp",
+                "src/Shader.cpp",
+                "src/ShaderProgram.cpp",
+                "src/glad.c",
+                "-Iinclude",
+                "-I/opt/homebrew/include",
+                "-L/opt/homebrew/lib",
+                "-lglfw",
+                "-framework",
+                "OpenGL",
+                "-o",
+                "opengl-testing"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build-test",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++17",
+                "src/test.cpp",
+                "-Iinclude",
+                "-I/opt/homebrew/include",
+                "-L/opt/homebrew/lib",
+                "-lglfw",
+                "-framework",
+                "OpenGL",
+                "-o",
+                "test"
+            ]
+        }
+    ]
+}
