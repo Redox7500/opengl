@@ -3,8 +3,7 @@
 #include <vector>
 #include <regex>
 #include <sstream>
-#include "UniformMaps.hpp"
-#include "UniformSetting.hpp"
+#include "Uniforms.hpp"
 #include "ShaderProgram.hpp"
 
 std::vector<std::string> findUniformNames(const std::string& source)
@@ -96,7 +95,7 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(id);
 }
 
-void ShaderProgram::setUniforms(UniformValuesMap uniforms)
+void ShaderProgram::setUniforms(uniforms::UniformValuesMap uniforms)
 {
     glUseProgram(id);
 
@@ -104,7 +103,7 @@ void ShaderProgram::setUniforms(UniformValuesMap uniforms)
     {
         if (uniformLocations.find(uniform.first) != uniformLocations.end())
         {
-            setUniform(uniformLocations.at(uniform.first), uniform.second);
+            uniforms::setUniform(uniformLocations.at(uniform.first), uniform.second);
         }
         else
         {

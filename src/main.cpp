@@ -11,7 +11,7 @@
 #include <glm/gtx/string_cast.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "UniformMaps.hpp"
+#include "Uniforms.hpp"
 #include "Shape.hpp"
 #include "Shader.hpp"
 #include "ShaderProgram.hpp"
