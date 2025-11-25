@@ -11,6 +11,8 @@
                 "src/Shape.cpp",
                 "src/Shader.cpp",
                 "src/ShaderProgram.cpp",
+                "src/Camera.cpp",
+                "src/UniformSetting.cpp",
                 "src/glad.c",
                 "-Iinclude",
                 "-I/opt/homebrew/include",

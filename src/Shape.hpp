@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
-#include "UniformMaps.hpp"
 #include "ShaderProgram.hpp"
 
 struct Vertex
@@ -14,10 +13,12 @@ struct Vertex
 class Shape
 {
     public:
-        Shape(const std::vector<glm::vec3>& vertexPositions, const std::vector<GLuint>& indices, const ShaderProgram& _shaderProgram);
+        glm::mat4 transform;
+
+        Shape(const std::vector<glm::vec3>& vertexPositions, const std::vector<GLuint>& indices, const ShaderProgram& shaderProgram, const glm::mat4& transform=glm::mat4(1.f));
         ~Shape();
 
-        void draw(const UniformValuesMap& uniforms);
+        void draw();
     
     private:
         const std::vector<GLuint> indices;

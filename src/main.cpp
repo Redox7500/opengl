@@ -4,22 +4,22 @@
 #include <sstream>
 #include <glad.h>
 #include <GLFW/glfw3.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "UniformMaps.hpp"
 #include "Shape.hpp"
 #include "Shader.hpp"
 #include "ShaderProgram.hpp"
+#include "Camera.hpp"
 
 const unsigned int SCREEN_WIDTH = 800;
 const unsigned int SCREEN_HEIGHT = 600;
 const std::string WINDOW_TITLE = "yes";
-glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.f);
-glm::mat4 view = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, -4.f));
-glm::mat4 model = glm::mat4(1.f);
 
 glm::vec3 lightPosition = glm::vec3(1.2f, 1.f, 2.f);
 
@@ -223,7 +223,7 @@ std::vector<glm::vec3> circle(float radius, unsigned int points)
 int main()
 {
     glfwInit();
-    
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -303,6 +303,9 @@ int main()
 
     Shape shape{vertices, indices, shaderProgram};
 
+    Camera camera{};
+    camera.setAspect((float)SCREEN_WIDTH / (float)SCREEN_HEIGHT);
+
     // GLuint albedoMap = generatePlainTexture(1, 1, glm::vec4(255.f, 0.f, 0.f, 255.f));
     // // GLuint albedoMap;
     // // glGenTextures(1, &albedoMap);
@@ -341,20 +344,21 @@ int main()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        model = glm::translate(model, velocity);
+        shape.transform = glm::translate(shape.transform, velocity);
 
         glClearColor(0.2f, 0.2f, 0.2f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shape.draw({
-            {"uProjection", projection},
-            {"uView", view},
-            {"uModel", model},
-            {"uViewPosition", glm::vec3(glm::inverse(view)[3])},
+        shaderProgram.setUniforms({
+            {"uProjection", camera.projection},
+            {"uView", glm::inverse(camera.transform)},
+            {"uModel", shape.transform},
+            {"uViewPosition", glm::vec3(glm::inverse(camera.transform)[3])},
             {"uLightPosition", lightPosition},
             {"uObjectColor", objectColor},
             {"uLightColor", lightColor}
         });
+        shape.draw();
         // shape.draw({
         //     {"uProjection", projection},
         //     {"uView", view},

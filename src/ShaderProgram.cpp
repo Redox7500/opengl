@@ -3,8 +3,8 @@
 #include <vector>
 #include <regex>
 #include <sstream>
-#include <glad.h>
 #include "UniformMaps.hpp"
+#include "UniformSetting.hpp"
 #include "ShaderProgram.hpp"
 
 std::vector<std::string> findUniformNames(const std::string& source)
@@ -40,8 +40,8 @@ std::vector<std::string> findUniformNames(const std::string& source)
     return ret;
 }
 
-ShaderProgram::ShaderProgram(const std::vector<Shader>& _shaders)
-    :shaders(_shaders),
+ShaderProgram::ShaderProgram(const std::vector<Shader>& shaders)
+    :shaders(shaders),
     id(glCreateProgram())
 {
     for (const Shader& shader:shaders)
@@ -60,19 +60,19 @@ ShaderProgram::ShaderProgram(const std::vector<Shader>& _shaders)
         std::cerr << "Shader program linking failed\n" << infoLog << "\n";
     }
 
-    // GLuint temporaryVAO;
-    // glGenVertexArrays(1, &temporaryVAO);
-    // glBindVertexArray(temporaryVAO);
-    // glValidateProgram(id);
-    // glBindVertexArray(0);
-    // glDeleteVertexArrays(1, &temporaryVAO);
-    // int validated;
-    // glGetProgramiv(id, GL_VALIDATE_STATUS, &validated);
-    // if (!validated)
-    // {
-    //     glGetProgramInfoLog(id, sizeof(infoLog), nullptr, infoLog);
-    //     std::cerr << "Shader program validation failed\n" << infoLog << "\n";
-    // }
+    GLuint temporaryVAO;
+    glGenVertexArrays(1, &temporaryVAO);
+    glBindVertexArray(temporaryVAO);
+    glValidateProgram(id);
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &temporaryVAO);
+    int validated;
+    glGetProgramiv(id, GL_VALIDATE_STATUS, &validated);
+    if (!validated)
+    {
+        glGetProgramInfoLog(id, sizeof(infoLog), nullptr, infoLog);
+        std::cerr << "Shader program validation failed\n" << infoLog << "\n";
+    }
     glUseProgram(id);
 
     for (const Shader& shader:shaders)
@@ -94,4 +94,21 @@ ShaderProgram::ShaderProgram(const std::vector<Shader>& _shaders)
 ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(id);
+}
+
+void ShaderProgram::setUniforms(UniformValuesMap uniforms)
+{
+    glUseProgram(id);
+
+    for (const auto& uniform:uniforms)
+    {
+        if (uniformLocations.find(uniform.first) != uniformLocations.end())
+        {
+            setUniform(uniformLocations.at(uniform.first), uniform.second);
+        }
+        else
+        {
+            std::cerr << "Uniform " << uniform.first << " not found";
+        }
+    }
 }

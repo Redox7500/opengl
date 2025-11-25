@@ -1,9 +1,10 @@
 #include <iostream>
 #include <string>
+#include <glad.h>
 #include "Shader.hpp"
 
-Shader::Shader(const std::string& _source, GLenum type)
-    :source(_source),
+Shader::Shader(const std::string& source, GLenum type)
+    :source(source),
     id(glCreateShader(type))
 {
     const char* shaderSourcePointer = source.c_str();

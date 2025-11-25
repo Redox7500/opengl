@@ -1,11 +1,7 @@
 #include <iostream>
-#include <vector>
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <type_traits>
 #include <glad.h>
-#include "UniformMaps.hpp"
-#include "UniformSetting.hpp"
 #include "ShaderProgram.hpp"
 #include "Shape.hpp"
 
@@ -92,9 +88,10 @@ void generateCubeUvs(std::vector<Vertex>& vertices)
     }
 }
 
-Shape::Shape(const std::vector<glm::vec3>& vertexPositions, const std::vector<GLuint>& indices, const ShaderProgram& _shaderProgram)
-    :indices(indices),
-    shaderProgram(_shaderProgram)
+Shape::Shape(const std::vector<glm::vec3>& vertexPositions, const std::vector<GLuint>& indices, const ShaderProgram& shaderProgram, const glm::mat4& transform)
+    :transform(transform),
+    indices(indices),
+    shaderProgram(shaderProgram)
 {
     std::vector<Vertex> vertices;
     generateVerticesFromPositions(vertices, vertexPositions);
@@ -132,21 +129,9 @@ Shape::~Shape()
     glDeleteBuffers(1, &EBO);
 }
 
-void Shape::draw(const UniformValuesMap& uniforms)
+void Shape::draw()
 {
     glUseProgram(shaderProgram.id);
-
-    for (const auto& uniform:uniforms)
-    {
-        if (shaderProgram.uniformLocations.find(uniform.first) != shaderProgram.uniformLocations.end())
-        {
-            setUniform(shaderProgram.uniformLocations.at(uniform.first), uniform.second);
-        }
-        else
-        {
-            std::cerr << "Uniform " << uniform.first << " not found";
-        }
-    }
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
